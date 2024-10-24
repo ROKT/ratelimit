@@ -1,0 +1,42 @@
+{
+    "rules": [
+      {
+        "rulePriority": 100,
+        "description": "retain up to 50 images for all other branches combined",
+        "selection": {
+          "tagStatus": "any",
+          "countType": "imageCountMoreThan",
+          "countNumber": 50
+        },
+        "action": {
+          "type": "expire"
+        }
+      },
+      {
+        "rulePriority": 10,
+        "description": "remove untagged images after 3 days",
+        "selection": {
+          "tagStatus": "untagged",
+          "countType": "sinceImagePushed",
+          "countUnit": "days",
+          "countNumber": 3
+        },
+        "action": {
+          "type": "expire"
+        }
+      },
+      {
+        "rulePriority": 1,
+        "description": "retain up to 100 images for main branch",
+        "selection": {
+          "tagStatus": "tagged",
+          "tagPrefixList": ["main"],
+          "countType": "imageCountMoreThan",
+          "countNumber": 100
+        },
+        "action": {
+          "type": "expire"
+        }
+      }
+    ]
+}

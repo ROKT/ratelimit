@@ -1,0 +1,52 @@
+env:
+  SERVICE_NAME: 'rokt-ratelimit-service'
+  TEAM: 'performant-experience-delivery'
+  ECR_REPO_NAME: 'rokt-ratelimit'
+  REALM: 'rokt'
+
+  ENG_QUEUE: 'eng-default'
+
+  IMAGE_NAME: 'rokt-ratelimit-service'
+  IMAGE_TAG: ${SANITISED_BRANCH_NAME}-${BUILDKITE_COMMIT}
+
+steps:
+  - label: ':hammer_and_wrench: Build Docker Image for Rokt Rate Limit Service'
+    key: deployment:${ECR_REPO_NAME}-build
+    timeout_in_minutes: 30
+    plugins:
+      - seek-oss/create-ecr#v1.5.0:
+          name: ${SERVICE_NAME}
+          lifecycle-policy: infra/ecr/lifecycle-policy.json
+          repository-policy: infra/ecr/repository-policy.json
+          repository-tags-file: infra/ecr/repository-tags.json
+          scan-on-push: true
+          regions:
+            - us-west-2
+            # - us-east-1
+            # - eu-west-1
+            - ap-southeast-2
+      - seek-oss/docker-ecr-publish#v2.5.0:
+          ecr-name: ${IMAGE_NAME}
+          dockerfile: Dockerfile
+          build-context: .
+          cache-from:
+            - ecr://${IMAGE_NAME}:${BUILDKITE_COMMIT}
+            - ecr://${IMAGE_NAME}:${BUILDKITE_BUILD_NUMBER}
+            - ecr://${IMAGE_NAME}:${IMAGE_TAG}
+            - ecr://${IMAGE_NAME}
+          tags:
+            - ${BUILDKITE_COMMIT}
+            - ${BUILDKITE_BUILD_NUMBER}
+            - ${IMAGE_TAG}
+          regions:
+            - us-west-2
+            # - us-east-1
+            # - eu-west-1
+            - ap-southeast-2
+      # - ssh://git@github.com/ROKT/ecr-scan-buildkite-plugin.git:
+      #     repositoryname: '${IMAGE_NAME}'
+      #     tag: ${BUILDKITE_BUILD_NUMBER}
+    agents:
+      queue: ${ENG_QUEUE}
+
+  

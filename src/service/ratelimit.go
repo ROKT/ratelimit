@@ -137,6 +137,8 @@ func (this *service) constructLimitsToCheck(request *pb.RateLimitRequest, ctx co
 				if limitsToCheck[i].Unlimited {
 					logger.Debugf("descriptor is unlimited, not passing to the cache")
 				} else {
+					logger.Debug("*********************** 429 *******************",)
+
 					logger.Debugf(
 						"applying limit: %d requests per %s, shadow_mode: %t",
 						limitsToCheck[i].Limit.RequestsPerUnit,
