@@ -34,6 +34,7 @@ steps:
             - ecr://${IMAGE_NAME}:${BUILDKITE_BUILD_NUMBER}
             - ecr://${IMAGE_NAME}:${IMAGE_TAG}
             - ecr://${IMAGE_NAME}
+          additional-build-args: '--platform=linux/amd64'
           tags:
             - ${BUILDKITE_COMMIT}
             - ${BUILDKITE_BUILD_NUMBER}
